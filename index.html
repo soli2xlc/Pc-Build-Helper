@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Build Guide - Schritt für Schritt zum eigenen PC</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        techBg: '#0b0f19',
+                        techCard: '#111827',
+                        techCardHover: '#1f2937',
+                        techBorder: '#1f2937',
+                        neonBlue: '#3b82f6',
+                        neonCyan: '#06b6d4',
+                        neonPurple: '#8b5cf6',
+                        neonGreen: '#10b981',
+                        neonRed: '#ef4444'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #e5e7eb;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+        .glow-blue {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="sticky top-0 z-40 bg-techBg/90 backdrop-blur-md border-b border-techBorder">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateToStep(0)">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid font-microchip"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-tight text-white">Rig<span class="text-cyan-400">Master</span></span>
+                    <span class="text-xs block text-slate-400 -mt-1 font-medium">Interaktiver PC-Bau-Guide</span>
+                </div>
+            </div>
+
+            <!-- Header Quick Controls -->
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <button onclick="openTroubleshootModal()" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-red-400"></i>
+                    <span>Fehlersuche</span>
+                </button>
+                <button onclick="toggleSidebar()" class="lg:hidden text-slate-300 hover:text-white p-2 rounded-lg border border-techBorder">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Bar Banner -->
+        <div class="bg-techCard border-t border-techBorder/50 py-2 px-4 sm:px-8">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                    <span id="progressText" class="text-xs sm:text-sm font-semibold text-cyan-400">Schritt 0 von 10: Vorbereitung</span>
+                    <span id="progressPercent" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">0%</span>
+                </div>
+                <div class="w-full sm:w-80 bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700">
+                    <div id="progressBar" class="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 h-2.5 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow flex gap-8 relative">
+
+        <!-- SIDEBAR NAVIGATION (Desktop & Mobile Drawer) -->
+        <aside id="sidebar" class="fixed lg:relative inset-y-0 left-0 z-50 w-72 lg:w-80 bg-techBg lg:bg-transparent border-r lg:border-r-0 border-techBorder lg:block transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 overflow-y-auto p-4 lg:p-0">
+            <div class="flex items-center justify-between lg:hidden mb-4 pb-2 border-b border-techBorder">
+                <span class="font-bold text-white">Schritt-Übersicht</span>
+                <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="bg-techCard border border-techBorder rounded-2xl p-4 sticky top-24 shadow-xl">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Inhaltsverzeichnis</h3>
+                <nav id="stepNav" class="space-y-1">
+                    <!-- Nav items dynamically created via JS -->
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Overlay for mobile sidebar -->
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+
+        <!-- CONTENT AREA -->
+        <main class="flex-grow min-w-0">
+            <div id="stepContent" class="bg-techCard border border-techBorder rounded-2xl p-5 sm:p-8 shadow-2xl relative">
+                <!-- Content inserted dynamically via JS -->
+            </div>
+
+            <!-- Step Navigation Buttons -->
+            <div class="mt-6 flex items-center justify-between gap-4">
+                <button id="prevBtn" onclick="prevStep()" class="px-5 py-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white font-semibold transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-arrow-left"></i> Zurück
+                </button>
+                <button id="nextBtn" onclick="nextStep()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold transition-all shadow-lg shadow-cyan-500/25 flex items-center gap-2">
+                    Weiter <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- TROUBLESHOOTING MODAL -->
+    <div id="troubleshootModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-techCard border border-techBorder rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <!-- Modal Header -->
+            <div class="p-5 border-b border-techBorder flex items-center justify-between bg-slate-900/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
+                        <i class="fa-solid fa-wrench text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Fehlersuche & Hilfe</h2>
+                        <p class="text-xs text-slate-400">PC startet nicht oder macht Probleme? Prüfe diese Punkte.</p>
+                    </div>
+                </div>
+                <button onclick="closeTroubleshootModal()" class="text-slate-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto space-y-4">
+                <!-- Search Box -->
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
+                    <input type="text" id="troubleshootSearch" onkeyup="filterTroubleshoot()" placeholder="Suchen (z.B. Kein Bild, Piepen, Netzteil...)" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <!-- Accordion Items -->
+                <div id="troubleshootList" class="space-y-3">
+                    <!-- Item 1 -->
+                    <div class="troubleshoot-item bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+                        <h3 class="font-bold text-cyan-400 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-power-off"></i> PC macht gar nichts (keine Lüfter, kein Licht)
+                        </h3>
+                        <ul class="mt-2 text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                            <li>Ist der Kippschalter hinten am Netzteil auf <strong>I (Ein)</strong> statt O (Aus) geschaltet?</li>
+                            <li>Ist das Kabel der Steckdose fest ins Netzteil eingesteckt?</li>
+                            <li>Sind die Frontpanel-Kabel (Power SW) richtig auf den Mainboard-Pins gesteckt?</li>
+                            <li>Ist das 24-Pin ATX-Hauptstromkabel fest ins Mainboard eingerastet?</li>
+                        </ul>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="troubleshoot-item bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+                        <h3 class="font-bold text-cyan-400 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-desktop"></i> Lüfter drehen sich, aber kein Bild am Monitor
+                        </h3>
+                        <ul class="mt-2 text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                            <li>Ist das Monitorkabel an der <strong>Grafikkarte</strong> eingesteckt (nicht am Mainboard)?</li>
+                            <li>Erhält die Grafikkarte Strom über das PCIe-Kabel vom Netzteil?</li>
+                            <li>Ist der RAM fest eingesteckt und eingerastet? (Testweise nur 1 RAM-Riegel probieren).</li>
+                            <li>Wurde der Monitor eingeschaltet und die richtige Signalquelle (HDMI/DisplayPort) gewählt?</li>
+                        </ul>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="troubleshoot-item bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+                        <h3 class="font-bold text-cyan-400 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-rotate"></i> PC geht an und schaltet sich sofort wieder aus (Reboot-Schleife)
+                        </h3>
+                        <ul class="mt-2 text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                            <li>Ist der CPU-Kühler fest montiert und die Folie an der Unterseite entfernt?</li>
+                            <li>Ist das CPU-Kühlerkabel an <strong>CPU_FAN</strong> am Mainboard angeschlossen?</li>
+                            <li>Wurde das 8-Pin CPU-Stromkabel (oben links am Mainboard) vergessen?</li>
+                            <li>Liegt ein Kurzschluss vor? Prüfe, ob alle Stand-offs (Abstandshalter) richtig platziert sind.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Item 4 -->
+                    <div class="troubleshoot-item bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+                        <h3 class="font-bold text-cyan-400 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-microchip"></i> DRAM / CPU Status-LEDs am Mainboard leuchten rot/gelb
+                        </h3>
+                        <ul class="mt-2 text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                            <li>DRAM-LED: Entferne den RAM und drücke ihn mit festem, gleichmäßigem Druck hinein, bis es vernehmbar klickt.</li>
+                            <li>Bei der ersten Inbetriebnahme kann "Memory Training" bei DDR5 bis zu 2-3 Minuten dauern. Bitte geduldig warten!</li>
+                            <li>CPU-LED: Prüfe, ob CPU-Pins verbogen wurden oder der CPU-Kühler zu fest angezogen ist.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-techBorder bg-slate-900/50 flex justify-end">
+                <button onclick="closeTroubleshootModal()" class="px-5 py-2 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 text-white text-sm font-semibold transition-all">
+                    Schließen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-techBorder py-6 text-center text-xs text-slate-500 bg-techBg">
+        <p>© 2026 RigMaster – Interaktive Schritt-für-Schritt PC-Bau Anleitung. Für Gamer, Enthusiasten & Einsteiger.</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // DATA STRUCTURE FOR STEPS
+        const stepsData = [
+            {
+                id: 0,
+                title: "Vorbereitung & Checkliste",
+                subtitle: "Werkzeuge und Komponenten bereitlegen",
+                icon: "fa-list-check",
+                contentHtml: `
+                    <p class="text-slate-300 text-sm mb-6 leading-relaxed">
+                        Bevor du deinen PC zusammenbaust, stelle sicher, dass du eine sauber aufgeräumte, gut beleuchtete Arbeitsfläche hast (am besten ein Holztisch, kein Teppich). Hake hier deine Werkzeuge und Komponenten ab, um zu prüfen, ob du bereit bist!
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <!-- Werkzeuge -->
+                        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-xl">
+                            <h4 class="font-bold text-cyan-400 text-base mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-screwdriver-wrench"></i> Benötigte Werkzeuge
+                            </h4>
+                            <div class="space-y-2.5 text-sm" id="toolsChecklist">
+                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-cyan-500 focus:ring-cyan-400 accent-cyan-500">
+                                    <span class="text-slate-200">Kreuzschlitz-Schraubendreher (PH2, magnetisch empfohlen)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-cyan-500 focus:ring-cyan-400 accent-cyan-500">
+                                    <span class="text-slate-200">Kabelbinder / Klettbinder</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-cyan-500 focus:ring-cyan-400 accent-cyan-500">
+                                    <span class="text-slate-200">Seitenschneider (für Kabelbinder)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-cyan-500 focus:ring-cyan-400 accent-cyan-500">
+                                    <span class="text-slate-200">Nicht-leitende Unterlage (Mainboard-Karton)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Komponenten -->
+                        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-xl">
+                            <h4 class="font-bold text-purple-400 text-base mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-boxes-packing"></i> PC-Komponenten
+                            </h4>
+                            <div class="space-y-2 text-xs sm:text-sm" id="componentsChecklist">
+                                <label class="flex items-center gap-3 cursor-pointer p-1.5 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-purple-500 focus:ring-purple-400 accent-purple-500">
+                                    <span class="text-slate-200">Prozessor (CPU)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer p-1.5 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-purple-500 focus:ring-purple-400 accent-purple-500">
+                                    <span class="text-slate-200">Mainboard</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer p-1.5 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-purple-500 focus:ring-purple-400 accent-purple-500">
+                                    <span class="text-slate-200">Arbeitsspeicher (RAM)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer p-1.5 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-purple-500 focus:ring-purple-400 accent-purple-500">
+                                    <span class="text-slate-200">M.2 SSD / Festplatte</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer p-1.5 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-purple-500 focus:ring-purple-400 accent-purple-500">
+                                    <span class="text-slate-200">CPU-Kühler & Wärmeleitpaste</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer p-1.5 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-purple-500 focus:ring-purple-400 accent-purple-500">
+                                    <span class="text-slate-200">Grafikkarte (GPU)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer p-1.5 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-purple-500 focus:ring-purple-400 accent-purple-500">
+                                    <span class="text-slate-200">Netzteil (PSU)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer p-1.5 rounded-lg hover:bg-slate-800/60 transition">
+                                    <input type="checkbox" onchange="updateChecklistProgress()" class="w-4 h-4 rounded text-purple-500 focus:ring-purple-400 accent-purple-500">
+                                    <span class="text-slate-200">Gehäuse (Case)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sicherheitshinweis Box -->
+                    <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex gap-4 items-start">
+                        <i class="fa-solid fa-shield-halved text-amber-400 text-2xl shrink-0 mt-0.5"></i>
+                        <div class="text-xs sm:text-sm text-slate-300">
+                            <h5 class="font-bold text-amber-400 mb-1">Wichtig: Statische Entladung vermeiden!</h5>
+                            <p>Elektrostatische Entladungen (ESD) können empfindliche Bauteile beschädigen. Erde dich regelmäßig, indem du an einen unlackierten Heizkörper fasst oder ein Anti-Statik-Armband getragen wird. Vermeide das Bauen auf Teppichböden.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 1,
+                title: "1. Vorbereitung & Arbeitsplatz",
+                subtitle: "Mainboard auspacken und Unterlage vorbereiten",
+                icon: "fa-desktop",
+                contentHtml: `
+                    <p class="text-slate-300 text-sm mb-5 leading-relaxed">
+                        Arbeite zu Beginn am besten außerhalb des Gehäuses. So hast du deutlich mehr Platz und Flexibilität beim Einsetzen von CPU, RAM und M.2 SSD.
+                    </p>
+
+                    <div class="space-y-4 mb-6">
+                        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
+                            <h4 class="font-bold text-cyan-400 text-sm mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-square-check"></i> Die Schritte im Detail:
+                            </h4>
+                            <ol class="list-decimal list-inside text-xs sm:text-sm text-slate-300 space-y-2">
+                                <li>Nimm das Mainboard aus der antistatischen Folie.</li>
+                                <li>Lege die Verkaufsverpackung (Karton) des Mainboards flach auf deinen Tisch.</li>
+                                <li>Platziere das Mainboard flach oben auf den Karton (nutze den Karton als Antistatik-Tisch).</li>
+                                <li><strong>Niemals</strong> das Mainboard auf die Antistatik-Folie legen! Die Außenseite mancher Schutzhüllen kann leicht leitfähig sein.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 flex gap-4 items-start">
+                        <i class="fa-solid fa-lightbulb text-blue-400 text-xl shrink-0"></i>
+                        <div class="text-xs sm:text-sm text-slate-300">
+                            <span class="font-bold text-blue-400">Pro-Tipp:</span> Behalte alle Schrauben, Verpackungen und kleinen Abdeckungen auf. Du wirst sie für spätere Upgrades oder Garantiefälle noch benötigen.
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                title: "2. CPU auf Mainboard installieren",
+                subtitle: "Das Herzstück des PCs richtig einbauen",
+                icon: "fa-microchip",
+                contentHtml: `
+                    <p class="text-slate-300 text-sm mb-5 leading-relaxed">
+                        Der Einbau der CPU erfordert etwas Präzision, ist aber simpel, solange du keinen Druck ausübst und auf die Ausrichtung achtest.
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-2">
+                            <h4 class="font-bold text-cyan-400 text-sm"><i class="fa-solid fa-arrow-right-long"></i> Intel Sockel (LGA)</h4>
+                            <p class="text-xs text-slate-300">Sockelhebel nach unten drücken und seitlich aushaken. Abdeckung klappt hoch. CPU nur an den Kanten anfassen. Ausrichtungs-Dreieck an CPU & Sockel abgleichen. CPU ohne Druck einlegen. Hebel schließen (Plastikschutz springt dabei meist von allein ab).</p>
+                        </div>
+                        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-2">
+                            <h4 class="font-bold text-purple-400 text-sm"><i class="fa-solid fa-arrow-right-long"></i> AMD Sockel (AM4/AM5)</h4>
+                            <p class="text-xs text-slate-300">Bei AM5 wie bei Intel Hebel öffnen. Bei AM4 Metallhebel hochklappen, CPU entsprechend der goldenen Ecken-Markierung vorsichtig in die Löcher gleiten lassen. Hebel festklemmen.</p>
+                        </div>
+                    </div>
+
+                    <!-- Checkliste -->
+                    <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl mb-6">
+                        <h5 class="font-bold text-slate-200 text-sm mb-2">Sicherheits-Checkliste für CPU:</h5>
+                        <ul class="text-xs text-slate-300 space-y-1.5">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Dreieck-Markierung auf CPU stimmt mit Sockel-Dreieck überein.</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Keine Pins am Sockel oder der CPU verbogen.</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> CPU sitzt flach und wackelfrei im Sockel bevor der Hebel geschlossen wird.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex gap-4 items-start">
+                        <i class="fa-solid fa-triangle-exclamation text-red-400 text-xl shrink-0"></i>
+                        <div class="text-xs sm:text-sm text-slate-300">
+                            <span class="font-bold text-red-400">Achtung:</span> Niemals Gewalt anwenden! Wenn die CPU richtig ausgerichtet ist, fällt sie spürbar von selbst in den Sockel.
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 3,
+                title: "3. RAM (Arbeitsspeicher) einsetzen",
+                subtitle: "Dual-Channel Konfiguration beachten",
+                icon: "fa-memory",
+                contentHtml: `
+                    <p class="text-slate-300 text-sm mb-5 leading-relaxed">
+                        Der Arbeitsspeicher muss in die richtigen Slots eingesteckt werden, damit Dual-Channel Modus aktiviert ist (für maximale Performance).
+                    </p>
+
+                    <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-xl mb-6 space-y-3">
+                        <h4 class="font-bold text-cyan-400 text-sm"><i class="fa-solid fa-layer-group"></i> Slot-Wahl (Dual-Channel):</h4>
+                        <p class="text-xs sm:text-sm text-slate-300">Bei 4 verfügbaren Slots und 2 RAM-Riegeln nutzt man fast immer <strong>Slot 2 und Slot 4</strong> (von der CPU aus nach rechts gezählt, oft als A2 & B2 beschriftet).</p>
+                        
+                        <div class="bg-slate-950 p-3 rounded-lg flex justify-center items-center gap-2 font-mono text-xs">
+                            <span class="text-slate-500">[CPU]</span>
+                            <span class="px-2 py-1 bg-slate-800 rounded text-slate-400">Slot 1</span>
+                            <span class="px-2 py-1 bg-cyan-500/20 border border-cyan-500 text-cyan-300 font-bold rounded">Slot 2 (RAM 1)</span>
+                            <span class="px-2 py-1 bg-slate-800 rounded text-slate-400">Slot 3</span>
+                            <span class="px-2 py-1 bg-cyan-500/20 border border-cyan-500 text-cyan-300 font-bold rounded">Slot 4 (RAM 2)</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 text-xs sm:text-sm text-slate-300 mb-6">
+                        <p><strong>So geht's:</strong></p>
+                        <ol class="list-decimal list-inside space-y-1 bg-slate-900/40 p-4 rounded-xl border border-slate-800">
+                            <li>Öffne die Halteklammern an den RAM-Slots.</li>
+                            <li>Achte auf die Aussparung (Einkerbung) im Kontrollsteg des RAM-Riegels und des Slots. Sie ist asymmetrisch!</li>
+                            <li>Drücke den RAM-Riegel senkrecht mit festem, gleichmäßigem Druck auf beiden Seiten hinein, bis die Klammern spürbar und hörbar <strong>"KLICK"</strong> machen.</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex gap-4 items-start">
+                        <i class="fa-solid fa-hand text-amber-400 text-xl shrink-0"></i>
+                        <div class="text-xs sm:text-sm text-slate-300">
+                            <span class="font-bold text-amber-400">Tipp:</span> RAM benötigt oft überraschend viel Druck zum Einrasten. Vergewissere dich vorher, dass die Einkerbung richtig ausgerichtet ist!
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                title: "4. M.2 SSD montieren",
+                subtitle: "Schnellen NVMe-Speicher installieren",
+                icon: "fa-hard-drive",
+                contentHtml: `
+                    <p class="text-slate-300 text-sm mb-5 leading-relaxed">
+                        M.2 SSDs werden direkt auf dem Mainboard verschraubt und bieten extrem schnelle Ladezeiten.
+                    </p>
+
+                    <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-xl mb-6 space-y-3">
+                        <h4 class="font-bold text-cyan-400 text-sm"><i class="fa-solid fa-wrench"></i> Schritt-für-Schritt Montage:</h4>
+                        <ol class="list-decimal list-inside text-xs sm:text-sm text-slate-300 space-y-2">
+                            <li>Lokalisiere den primären M.2-Slot (meist direkt unter der CPU, oft mit Metall-Kühlkörper abgedeckt).</li>
+                            <li>Falls vorhanden, schraube den M.2-Kühlkörper ab und ziehe die Schutzfolie vom Wärmeleitpad ab!</li>
+                            <li>Schiebe die M.2 SSD im leicht schrägen Winkel (ca. 30 Grad) in den Slot, bis die Kontakte verschwinden.</li>
+                            <li>Drücke die SSD sanft herunter und fixiere sie mit der kleinen M.2-Schraube oder dem EZ-Latch Schieber.</li>
+                            <li>Schraube den M.2-Kühlkörper wieder fest.</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex gap-4 items-start">
+                        <i class="fa-solid fa-triangle-exclamation text-red-400 text-xl shrink-0"></i>
+                        <div class="text-xs sm:text-sm text-slate-300">
+                            <span class="font-bold text-red-400">Häufiger Fehler:</span> Vergiss nicht, die blaue/transparente Plastikfolie an der Unterseite des M.2-Kühlkörpers zu entfernen, da die SSD sonst überhitzt!
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                title: "5. CPU-Kühler montieren",
+                subtitle: "Luftkühler oder AIO-Wasserkühlung aufsetzen",
+                icon: "fa-fan",
+                contentHtml: `
+                    <p class="text-slate-300 text-sm mb-5 leading-relaxed">
+                        Die Kühlung ist entscheidend für stabile Performance. Egal ob Luftkühler oder All-in-One Wasserkühlung (AIO) – das Prinzip ist ähnlich.
+                    </p>
+
+                    <div class="space-y-4 mb-6">
+                        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+                            <h4 class="font-bold text-cyan-400 text-sm mb-2"><i class="fa-solid fa-droplet"></i> Wärmeleitpaste (WLP)</h4>
+                            <p class="text-xs sm:text-sm text-slate-300">Viele Kühler haben bereits ab Werk Wärmeleitpaste aufgetragen. Falls nicht: Trage einen erbsengroßen Punkt Wärmeleitpaste genau in die Mitte der CPU-Oberfläche auf.</p>
+                        </div>
+
+                        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+                            <h4 class="font-bold text-purple-400 text-sm mb-2"><i class="fa-solid fa-screwdriver"></i> Montage & Anschluss</h4>
+                            <p class="text-xs sm:text-sm text-slate-300 mb-2">Befestige den Kühler über Kreuz (überkreuztes Anziehen der Schrauben sorgt für gleichmäßigen Anpressdruck).</p>
+                            <p class="text-xs sm:text-sm text-slate-300">Schließe das Lüfterkabel unbedingt an den PIN-Header <strong>CPU_FAN</strong> oben am Mainboard an!</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex gap-4 items-start">
+                        <i class="fa-solid fa-shield-cat text-amber-400 text-2xl shrink-0"></i>
+                        <div class="text-xs sm:text-sm text-slate-300">
+                            <span class="font-bold text-amber-400">WARNUNG #1 Ursache für Hitzeprobleme:</span> Ziehe vor der Montage unbedingt die durchsichtige Plastikschutzfolie von der Kupfer-Unterseite des Kühlers ab!
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 6,
+                title: "6. Mainboard ins Gehäuse einbauen",
+                subtitle: "Vorbereitung des Gehäuses und Festschrauben",
+                icon: "fa-box",
+                contentHtml: `
+                    <p class="text-slate-300 text-sm mb-5 leading-relaxed">
+                        Jetzt wandert das bestückte Mainboard in das PC-Gehäuse.
+                    </p>
+
+                    <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-xl mb-6 space-y-3">
+                        <h4 class="font-bold text-cyan-400 text-sm"><i class="fa-solid fa-list-ol"></i> Schritte:</h4>
+                        <ol class="list-decimal list-inside text-xs sm:text-sm text-slate-300 space-y-2">
+                            <li><strong>I/O-Blende prüfen:</strong> Wenn dein Mainboard keine fest integrierte Blende hat, drücke die mitgelieferte Metallblende von innen in die hintere Öffnung des Gehäuses.</li>
+                            <li><strong>Abstandshalter (Stand-offs) kontrollieren:</strong> Stelle sicher, dass im Gehäuse nur an den Stellen Abstandshalter eingeschraubt sind, an denen dein Mainboard Schraubenlöcher hat! (Überflüssige Abstandshalter können Kurzschlüsse verursachen).</li>
+                            <li>Setze das Mainboard vorsichtig schräg ein, richte es an den Anschlüssen hinten aus und lege es auf die Abstandshalter.</li>
+                            <li>Verschraube das Mainboard mit den dafür vorgesehenen Mainboardschrauben (handfest anziehen, nicht überdrehen).</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 flex gap-4 items-start">
+                        <i class="fa-solid fa-circle-info text-blue-400 text-xl shrink-0"></i>
+                        <div class="text-xs sm:text-sm text-slate-300">
+                            <span class="font-bold text-blue-400">Hinweis:</span> In der Mitte moderner Gehäuse gibt es oft einen Zentrier-Stift (Center Standoff), der das Board beim Schrauben in Position hält.
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 7,
+                title: "7. Netzteil (PSU) montieren",
+                subtitle: "Stromversorgung einbauen und Kabel vorbereiten",
+                icon: "fa-plug",
+                contentHtml: `
+                    <p class="text-slate-300 text-sm mb-5 leading-relaxed">
+                        Das Netzteil versorgt das gesamte System mit Strom. Bei modularen Netzteilen steckst du vorher nur die benötigten Kabel an.
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-2">
+                            <h4 class="font-bold text-cyan-400 text-sm"><i class="fa-solid fa-compass"></i> Einbaurichtung</h4>
+                            <p class="text-xs text-slate-300">In 95% der Gehäuse zeigt der Lüfter des Netzteils <strong>nach unten</strong> (durch den Staubfilter am Gehäuseboden), um kalte Luft von außen anzusaugen.</p>
+                        </div>
+                        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-2">
+                            <h4 class="font-bold text-purple-400 text-sm"><i class="fa-solid fa-diagram-project"></i> Kabel-Vorauswahl</h4>
+                            <p class="text-xs text-slate-300">Benötigt werden: 24-Pin ATX (Mainboard), 8-Pin CPU (EPS), PCIe-Kabel (Grafikkarte) und ggf. SATA-Stromkabel.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl mb-6 text-xs sm:text-sm text-slate-300">
+                        <strong>Einbau:</strong> Schiebe das Netzteil in den Netzteil-Schacht hinten unten im Gehäuse und verschraube es von außen an den 4 Schraubenpunkten.
+                    </div>
+                `
+            },
+            {
+                id: 8,
+                title: "8. Stromkabel & Frontpanel anschließen",
+                subtitle: "Mainboard mit Strom und Gehäuse-Tastern verbinden",
+                icon: "fa-network-wired",
+                contentHtml: `
+                    <p class="text-slate-300 text-sm mb-5 leading-relaxed">
+                        Nun verbinden wir die Stromkabel und die kleinen Kabel der Gehäuse-Vorderseite (Power-Knopf, LEDs, USB).
+                    </p>
+
+                    <div class="space-y-4 mb-6">
+                        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-2">
+                            <h4 class="font-bold text-cyan-400 text-sm"><i class="fa-solid fa-bolt"></i> Stromanschlüsse</h4>
+                            <ul class="text-xs sm:text-sm text-slate-300 space-y-2 list-disc list-inside">
+                                <li><strong>24-Pin ATX:</strong> Der breite Stecker rechts am Mainboard. Fest drücke, bis die Nase einrastet!</li>
+                                <li><strong>8-Pin / 4+4-Pin CPU:</strong> Oben links über dem CPU-Sockel. Nicht mit PCIe-Kabel verwechseln!</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-2">
+                            <h4 class="font-bold text-purple-400 text-sm"><i class="fa-solid fa-sliders"></i> Front-Panel Header (JFP1)</h4>
+                            <p class="text-xs text-slate-300">Die winzigen Stecker für <code>POWER SW</code>, <code>RESET SW</code>, <code>HDD LED</code> unten rechts am Board. Wirf einen Blick ins Handbuch des Mainboards für die exakte Belegung der Plus/Minus-Pins!</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex gap-4 items-start">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400 text-xl shrink-0"></i>
+                        <div class="text-xs sm:text-sm text-slate-300">
+                            <span class="font-bold text-amber-400">Verwechslungsgefahr:</span> CPU-Stromkabel (EPS) und PCIe-Stromkabel sehen ähnlich aus. EPS lässt sich meist in 4+4 Pins teilen, PCIe in 6+2 Pins.
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 9,
+                title: "9. Grafikkarte (GPU) einbauen",
+                subtitle: "Die Grafikleistung installieren",
+                icon: "fa-gamepad",
+                contentHtml: `
+                    <p class="text-slate-300 text-sm mb-5 leading-relaxed">
+                        Die Grafikkarte ist meist die größte Komponente und wird fast ganz zum Schluss eingebaut.
+                    </p>
+
+                    <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-xl mb-6 space-y-3">
+                        <h4 class="font-bold text-cyan-400 text-sm"><i class="fa-solid fa-list-check"></i> Einbau-Schritte:</h4>
+                        <ol class="list-decimal list-inside text-xs sm:text-sm text-slate-300 space-y-2">
+                            <li>Entferne die entsprechenden Metall-Slotblenden an der Rückseite des Gehäuses (meist Slot 2 & 3 von oben).</li>
+                            <li>Öffne den Plastik-Sicherungshebel am obersten langen PCIe-16x-Slot des Mainboards.</li>
+                            <li>Richte die GPU aus und drücke sie fest in den Slot, bis der Sicherheitshebel hörbar <strong>einklickt</strong>.</li>
+                            <li>Verschraube die GPU an der Gehäuserückseite mit den Slot-Schrauben.</li>
+                            <li>Schließe die erforderlichen PCIe-Stromkabel (6+2-Pin oder den neuen 12VHPWR/12V-2x6 Stecker) an die Grafikkarte an.</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex gap-4 items-start">
+                        <i class="fa-solid fa-fire-flame-curled text-red-400 text-xl shrink-0"></i>
+                        <div class="text-xs sm:text-sm text-slate-300">
+                            <span class="font-bold text-red-400">Wichtig bei 12VHPWR (Nvidia RTX 40er):</span> Stelle sicher, dass der 12+4-Pin Stecker absolut vollständig und ohne Lücke tief in die Grafikkarte eingesteckt ist, um Überhitzung zu vermeiden!
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 10,
+                title: "10. Kabelmanagement & Erster Start!",
+                subtitle: "Alles aufräumen und den Power-Knopf drücken",
+                icon: "fa-rocket",
+                contentHtml: `
+                    <p class="text-slate-300 text-sm mb-5 leading-relaxed">
+                        Der große Moment ist da! Vor dem ersten Einschalten ordnen wir noch die Kabel und prüfen alle Verbindungen.
+                    </p>
+
+                    <div class="space-y-4 mb-6">
+                        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+                            <h4 class="font-bold text-cyan-400 text-sm mb-2"><i class="fa-solid fa-broom"></i> Kabelmanagement</h4>
+                            <p class="text-xs sm:text-sm text-slate-300">Nimm Kabelbinder und fixiere lose Kabel an der Rückseite des Gehäuses. Das sorgt nicht nur für einen sauberen Look, sondern verbessert auch den Luftstrom.</p>
+                        </div>
+
+                        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+                            <h4 class="font-bold text-purple-400 text-sm mb-2"><i class="fa-solid fa-power-off"></i> Der First Boot Checklist:</h4>
+                            <ul class="text-xs sm:text-sm text-slate-300 space-y-1.5 list-disc list-inside">
+                                <li>Monitor an der <strong>Grafikkarte</strong> angeschlossen (nicht am Mainboard)?</li>
+                                <li>Netzteilschalter hinten auf <strong>"I" (EIN)</strong> gestellt?</li>
+                                <li>USB-Stick mit Windows-Installation eingesteckt?</li>
+                                <li>Drücke den Power-Knopf am Gehäuse!</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-5 text-center space-y-3">
+                        <div class="text-emerald-400 text-3xl"><i class="fa-solid fa-circle-check"></i></div>
+                        <h4 class="font-bold text-emerald-400 text-base">Glückwunsch zum eigenen PC-Build!</h4>
+                        <p class="text-xs sm:text-sm text-slate-300">Wenn sich die Lüfter drehen und ein Bild mit dem Logo deines Mainboards erscheint, hast du es geschafft! Drücke <kbd class="px-2 py-1 bg-slate-800 rounded text-xs border border-slate-700">ENTF</kbd> oder <kbd class="px-2 py-1 bg-slate-800 rounded text-xs border border-slate-700">F2</kbd>, um ins BIOS zu gelangen und aktiviere dort XMP / EXPO für deinen RAM.</p>
+                    </div>
+                `
+            }
+        ];
+
+        // CURRENT STATE
+        let currentStep = 0;
+
+        // INITIALIZATION
+        window.onload = function() {
+            renderSidebar();
+            renderStep();
+        };
+
+        // RENDER SIDEBAR NAV
+        function renderSidebar() {
+            const nav = document.getElementById('stepNav');
+            nav.innerHTML = '';
+
+            stepsData.forEach((step, index) => {
+                const btn = document.createElement('button');
+                btn.onclick = () => navigateToStep(index);
+                btn.className = `w-full text-left px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-between ${
+                    index === currentStep 
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/50 text-cyan-300 font-semibold' 
+                    : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 border border-transparent'
+                }`;
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-2.5 truncate">
+                        <i class="fa-solid ${step.icon} text-sm ${index === currentStep ? 'text-cyan-400' : 'text-slate-500'}"></i>
+                        <span class="truncate">${step.title}</span>
+                    </div>
+                    ${index === 0 ? '<span class="text-[10px] bg-slate-800 text-cyan-400 px-1.5 py-0.5 rounded border border-slate-700">Start</span>' : ''}
+                `;
+                nav.appendChild(btn);
+            });
+        }
+
+        // RENDER CURRENT STEP CONTENT
+        function renderStep() {
+            const data = stepsData[currentStep];
+            const contentDiv = document.getElementById('stepContent');
+
+            contentDiv.innerHTML = `
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-lg">
+                        <i class="fa-solid ${data.icon}"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Schritt ${data.id} von 10</span>
+                        <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">${data.title}</h1>
+                    </div>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-400 mb-6 font-medium">${data.subtitle}</p>
+                <div class="border-t border-techBorder pt-6">
+                    ${data.contentHtml}
+                </div>
+            `;
+
+            // Update Progress Header
+            const progressPercent = Math.round((currentStep / (stepsData.length - 1)) * 100);
+            document.getElementById('progressText').innerText = `Schritt ${currentStep} von 10: ${data.title}`;
+            document.getElementById('progressPercent').innerText = `${progressPercent}%`;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+            // Navigation Buttons State
+            document.getElementById('prevBtn').disabled = currentStep === 0;
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentStep === stepsData.length - 1) {
+                nextBtn.innerHTML = `Fertigstellen <i class="fa-solid fa-check"></i>`;
+            } else {
+                nextBtn.innerHTML = `Weiter <i class="fa-solid fa-arrow-right"></i>`;
+            }
+
+            renderSidebar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // STEP CONTROLS
+        function navigateToStep(index) {
+            currentStep = index;
+            renderStep();
+            // Close mobile sidebar if open
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (!sidebar.classList.contains('-translate-x-full')) {
+                toggleSidebar();
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < stepsData.length - 1) {
+                currentStep++;
+                renderStep();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                renderStep();
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        // CHECKLIST LOGIC
+        function updateChecklistProgress() {
+            // Optional feedback effect on checklist items
+        }
+
+        // TROUBLESHOOTING MODAL LOGIC
+        function openTroubleshootModal() {
+            document.getElementById('troubleshootModal').classList.remove('hidden');
+        }
+
+        function closeTroubleshootModal() {
+            document.getElementById('troubleshootModal').classList.add('hidden');
+        }
+
+        function filterTroubleshoot() {
+            const query = document.getElementById('troubleshootSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.troubleshoot-item');
+
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
